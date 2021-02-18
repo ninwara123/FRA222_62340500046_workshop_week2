@@ -46,6 +46,7 @@ UART_HandleTypeDef huart2;
 //save status button matrix
 uint16_t ButtonMatrixState =0;
 uint32_t ButtonMatrixTimestamp =0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -75,7 +76,8 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+
+	HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -100,7 +102,7 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+	  ButtonMatrixUpdate();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -270,11 +272,11 @@ void ButtonMatrixUpdate()
 			GPIO_PinState PinState = HAL_GPIO_ReadPin(ButtonMatrixProt[i],ButtonMatrixPin[i]);
 			if(PinState == GPIO_PIN_RESET)
 			{
-				ButtonMatrixState = (uint16_t)1 <<(i+ButtonMatrixRow*4);
+				ButtonMatrixState |= (uint16_t)0x1 <<(i+ButtonMatrixRow*4);
 			}
 			else
 			{
-				ButtonMatrixState &= ~((uint16_t)1 <<(i+ButtonMatrixRow*4));
+				ButtonMatrixState &= ~((uint16_t)0x1 <<(i+ButtonMatrixRow*4));
 			}
 		}
 		uint8_t NowOutputPin = ButtonMatrixRow+4;
@@ -282,8 +284,8 @@ void ButtonMatrixUpdate()
 				ButtonMatrixPin[NowOutputPin], GPIO_PIN_SET);
 		ButtonMatrixRow = (ButtonMatrixRow+1)%4;
 		uint8_t NextOutputPin = ButtonMatrixRow+4;
-		HAL_GPIO_WritePin(ButtonMatrixProt[NowOutputPin],
-				ButtonMatrixPin[NowOutputPin], GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(ButtonMatrixProt[NextOutputPin],
+				ButtonMatrixPin[NextOutputPin], GPIO_PIN_RESET);
 
 	}
 }
